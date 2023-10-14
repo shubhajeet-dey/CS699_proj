@@ -1,0 +1,4 @@
+django
+PyPDF2
+Pillow
+pdf2image

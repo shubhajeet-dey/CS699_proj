@@ -1,3 +1,0 @@
-django
-PyPDF2
-Pillow

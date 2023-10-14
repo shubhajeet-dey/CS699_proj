@@ -10,4 +10,4 @@ python3 -m virtualenv venv_proj
 source ./venv_proj/bin/activate
 
 # Installing necessary Python packages
-python3 -m pip install -r ./requirements.txt
+python3 -m pip install -r ./pip_requirements.txt
