@@ -11,3 +11,8 @@ source ./venv_proj/bin/activate
 
 # Installing necessary Python packages
 python3 -m pip install -r ./pip_requirements.txt
+
+# Setting uploads, results and temporary directory
+curr_dir=$(pwd)
+
+echo "export UPLOAD_FILES_PATH=\"${curr_dir}/uploads\"; export TEMP_FILES_PATH=\"${curr_dir}/temp\"; export FINAL_FILES_PATH=\"${curr_dir}/final_results\";" >> ./venv_proj/bin/activate
