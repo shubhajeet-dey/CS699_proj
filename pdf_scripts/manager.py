@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-import base64
-import json
-import sys
 from merge_pdf import merge_pdf
 from split_pdf import split_pdf
 from pdf_to_image import pdf_to_image
 from rotate_pdf import rotate_pdf
+from encrypt_pdf import encrypt_pdf
+import base64
+import json
+import sys
 
 if __name__ == "__main__":
 
@@ -27,6 +28,10 @@ if __name__ == "__main__":
 
 		if content["operation"] == "rotate":
 			print(rotate_pdf(content["file"], content["rotate_angle"]))
+			sys.exit(0)
+
+		if content["operation"] == "encrypt":
+			print(encrypt_pdf(content["file"], content["password"], content["process_type"]))
 			sys.exit(0)
 
 	except:
