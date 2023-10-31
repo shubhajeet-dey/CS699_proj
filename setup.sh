@@ -12,6 +12,11 @@ source ./venv_proj/bin/activate
 # Installing necessary Python packages
 python3 -m pip install -r ./pip_requirements.txt
 
+# Making directories to process pdf files
+mkdir final_results
+mkdir temp
+mkdir uploads
+
 # Setting uploads, results and temporary directory
 curr_dir=$(pwd)
 
