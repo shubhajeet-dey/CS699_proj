@@ -16,23 +16,18 @@ if __name__ == "__main__":
 	try:
 		if content["operation"] == "merge":
 			print(merge_pdf(content["files"]))
-			sys.exit(0)
-
-		if content["operation"] == "split":
+		
+		elif content["operation"] == "split":
 			print(split_pdf(content["file"], content["split_points"]))
-			sys.exit(0)
 
-		if content["operation"] == "pdf_to_image":
+		elif content["operation"] == "pdf_to_image":
 			print(pdf_to_image(content["file"], content["image_type"]))
-			sys.exit(0)
 
-		if content["operation"] == "rotate":
+		elif content["operation"] == "rotate":
 			print(rotate_pdf(content["file"], content["rotate_angle"]))
-			sys.exit(0)
 
-		if content["operation"] == "encrypt":
+		elif content["operation"] == "encrypt":
 			print(encrypt_pdf(content["file"], content["password"], content["process_type"]))
-			sys.exit(0)
 
 	except:
 		print("Error: File Handling")
