@@ -1,14 +1,14 @@
 <?php
 session_start();
-unset($_SESSION['merge']);
-$_SESSION['merge'] = array('active'=>1);
-$_SESSION['merge']['process'] = 0;
+unset($_SESSION['pdftoimg']);
+$_SESSION['pdftoimg'] = array('active'=>1);
+$_SESSION['pdftoimg']['process'] = 0;
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Merge PDFs</title>
+    <title>Convert PDF to IMGs</title>
     <style>
         body {
             background-image: url('image2.webp');
@@ -65,10 +65,10 @@ $_SESSION['merge']['process'] = 0;
 
         #upload {
             text-align: center;
-            margin-top: 22%;
+            margin-top: 15%;
         }
 
-        #uploaded-files {
+        #uploaded-file {
             text-align: center;
             margin-top: 20px;
         }
@@ -91,7 +91,7 @@ $_SESSION['merge']['process'] = 0;
 
         #submit-container {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 80px;
         }
 
         #submit-button {
@@ -109,6 +109,47 @@ $_SESSION['merge']['process'] = 0;
         #sign-in {
             order: 0;
         }
+
+        .dropdown-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .dropdown-button {
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .dropdown-button:hover {
+            background-color: #2980b9;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            justify-content: center;
+            left: 50%;
+            width: 60px;
+            margin-left:-30px;
+        }
+
+        .dropdown-option {
+            padding: 10px;
+            color: #3498db;
+            cursor: pointer;
+        }
+
+        .dropdown-option:hover {
+            background-color: #f0f0f0;
+        }
+
     </style>
 </head>
 <body>
@@ -130,13 +171,22 @@ $_SESSION['merge']['process'] = 0;
         </div>
     </div>
 
-    <form method="post" action="merge_process.php" enctype="multipart/form-data">
+    <form method="post" action="pdftoimg_process.php" enctype="multipart/form-data">
         <div id="upload">
-            <label for="file-upload" class="upload-button">Upload Files</label>
-            <input type="file" id="file-upload" accept=".pdf" name="uploadedFiles[]" multiple required>
+            <label for="file-upload" class="upload-button">Upload File</label>
+            <input type="file" id="file-upload" accept=".pdf" name="uploadedFile" required>
         </div>
 
-        <div id="uploaded-files"></div>
+        <div id="uploaded-file"></div>
+        <div class="dropdown-container">
+            <button class="dropdown-button" onclick="toggleDropdown()" type="button">Choose Image Type</button>
+            <div class="dropdown-content" id="imageTypeDropdown">
+                <div class="dropdown-option" onclick="selectOption('JPEG')">JPEG</div>
+                <div class="dropdown-option" onclick="selectOption('PNG')">PNG</div>
+            </div>
+        </div>
+    
+        <input type="hidden" name="selectedOption" id="selectedOption" value="">
 
         <div id="submit-container">
             <input type="submit" id="submit-button">
@@ -164,26 +214,35 @@ $_SESSION['merge']['process'] = 0;
         });
 
         const fileInput = document.getElementById('file-upload');
-        const fileDisplay = document.getElementById('uploaded-files');
-        const uploadedFiles = [];
+        const fileDisplay = document.getElementById('uploaded-file');
 
         fileInput.addEventListener('change', function () {
-            for (let i = 0; i < fileInput.files.length; i++) {
-                const file = fileInput.files[i];
-                const fileName = file.name;
-                const fileType = file.type;
 
-                if (uploadedFiles.indexOf(fileName) === -1) {
-                    uploadedFiles.push(fileName);
-
-                    const fileInfo = document.createElement('div');
-                    fileInfo.innerText = `${fileName} (${fileType})`;
-                    fileInfo.style.color = 'white'; 
-                    fileDisplay.appendChild(fileInfo);
-                }
-            }
+            fileDisplay.innerHTML = '';
+            const fileInfo = document.createElement('div');
+            fileInfo.innerText = `${fileInput.files[0].name} (${fileInput.files[0].type})`;
+            fileInfo.style.color = 'white';
+            fileDisplay.appendChild(fileInfo);
         });
 
+        function toggleDropdown() {
+            var dropdownContent = document.getElementById("imageTypeDropdown");
+            dropdownContent.style.display = (dropdownContent.style.display === "block") ? "none" : "block";
+        }
+
+        function selectOption(option) {
+            var dropdownButton = document.querySelector('.dropdown-button');
+            var selectedOptionInput = document.getElementById('selectedOption');
+            
+            dropdownButton.innerHTML = option;
+            dropdownButton.style.backgroundColor = '#3498db';
+            dropdownButton.style.color = '#ffffff';
+
+            selectedOptionInput.value = option;
+
+            var dropdownContent = document.getElementById("imageTypeDropdown");
+            dropdownContent.style.display = "none";
+        }
     </script>
 </body>
 </html>

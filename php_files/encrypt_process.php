@@ -1,69 +1,69 @@
 <?php
 session_start();
 
-$_SESSION['merge']['error'] = '';
+$_SESSION['encrypt']['error'] = '';
 $uploadDir = '../uploads/';
 $venvDir = '../venv_proj/bin/activate';
 
 // Checking if request was indeed POST request
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    //Checking if the request came from merge.php
-    if(!isset($_SESSION['merge']['active']) || $_SESSION['merge']['active'] === 0) {
-        header("Location: merge.php");
+    //Checking if the request came from pdftoimg.php
+    if(!isset($_SESSION['encrypt']['active']) || $_SESSION['encrypt']['active'] === 0) {
+        header("Location: encrypt.php");
         exit();
     }
-    $_SESSION['merge']['active'] = 0;
-    $_SESSION['merge']['process'] = 1;
+    
+    $_SESSION['encrypt']['active'] = 0;
+    $_SESSION['encrypt']['process'] = 1;
+    $allowedImageExts = ['JPEG','PNG'];
 
-    // Check if the files are uploaded
-    if (!empty($_FILES["uploadedFiles"]["name"][0])) {
+    // Check if the file is uploaded
+    if (!empty($_FILES["uploadedFile"]["name"]) && isset($_POST["selectedOption"]) && in_array($_POST["selectedOption"], $allowedImageExts, True)) {
         $allowedMimeType = 'application/pdf';
-        $newFiles = [];
+        $newFile = "";
 
-        // Process each uploaded file individually
-        foreach ($_FILES["uploadedFiles"]["name"] as $key => $value) {
-            if($_FILES["uploadedFiles"]["size"][$key] <= 52428800)
-            {
-                $uploadedFileType = mime_content_type($_FILES["uploadedFiles"]["tmp_name"][$key]);
+        // Process uploaded file
+        if($_FILES["uploadedFile"]["size"] <= 52428800)
+        {
+            $uploadedFileType = mime_content_type($_FILES["uploadedFile"]["tmp_name"]);
 
-                // Check if the file mime type is allowed
-                if ($uploadedFileType === $allowedMimeType) {
+            // Check if the file mime type is allowed
+            if ($uploadedFileType === $allowedMimeType) {
 
-                    // Generate a random filename
-                    $randomFileName = bin2hex(random_bytes(8)) . '.pdf';
+                // Generate a random filename
+                $randomFileName = bin2hex(random_bytes(8)) . '.pdf';
 
-                    // Move the uploaded file to a new location with the random filename
-                    move_uploaded_file($_FILES["uploadedFiles"]["tmp_name"][$key], $uploadDir . $randomFileName);
+                // Move the uploaded file to a new location with the random filename
+                move_uploaded_file($_FILES["uploadedFile"]["tmp_name"], $uploadDir . $randomFileName);
 
-                    array_push($newFiles, $randomFileName);
+                $newFile = $randomFileName;
 
-                } else {
-                    $_SESSION['merge']['error'] = "File {$key}: Invalid file type!";
-                }
-            }else{
-                $_SESSION['merge']['error'] = "File {$key}: Size more than 50MB!";
+            } else {
+                $_SESSION['pdftoimg']['error'] = "File {$_FILES["uploadedFile"]["name"]}: Invalid file type!";
             }
+        }else{
+            $_SESSION['pdftoimg']['error'] = "File {$_FILES["uploadedFile"]["name"]}: Size more than 50MB!";
         }
 
-        if(empty($_SESSION['merge']['error'])) {
+        if(empty($_SESSION['pdftoimg']['error'])) {
             // Executing the python script
-            $args = array("operation"=>"merge","files"=>$newFiles);
+            $args = array("operation"=>"pdf_to_image","file"=>$newFile,"image_type"=>$_POST['selectedOption']);
             $bashCommand = '. '. $venvDir .' && python3 ../pdf_scripts/manager.py ' . escapeshellarg(base64_encode(json_encode($args)));
             $output_file = shell_exec($bashCommand);
 
             //Error while executing the script
-            if($output_file == null || $output_file === 'Error: File Handling' || $output_file === false) {
-                $_SESSION['merge']['error'] = 'Error while processing the files!';
+            if($output_file == null || strpos($output_file, 'Error') !== false || $output_file === false) {
+                $_SESSION['pdftoimg']['error'] = 'Error while processing the files!';
             }else{
-                $_SESSION['merge']['file'] = $output_file;
+                $_SESSION['pdftoimg']['file'] = $output_file;
             }
         }
     } else {
-        $_SESSION['merge']['error'] = 'Error in uploading the files!';
+        $_SESSION['pdftoimg']['error'] = 'Error in uploading the files or Error in Image type selection!';
     }
-}else if(!isset($_SESSION['merge']['process']) || $_SESSION['merge']['process'] === 0){
-    header("Location: merge.php");
+}else if(!isset($_SESSION['pdftoimg']['process']) || $_SESSION['pdftoimg']['process'] === 0){
+    header("Location: pdftoimg.php");
     exit();
 }
 ?>
@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Merge PDFs</title>
+    <title>Convert PDF to IMGs</title>
     <style>
         body {
             background-image: url('image2.webp');
@@ -193,10 +193,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <?php 
                 // Checking if no error message
-                if(empty($_SESSION['merge']['error'])) {
-                    echo '<a id="download-button" href="download.php?op=merge">Download Merge PDF</a>';
+                if(empty($_SESSION['pdftoimg']['error'])) {
+                    echo '<a id="download-button" href="download.php?op=pdftoimg">Download ZIP of Images</a>';
                 }else{
-                    echo '<h4 id="download-button">'. $_SESSION['merge']['error'] .'</h4>';
+                    echo '<h4 id="download-button">'. $_SESSION['pdftoimg']['error'] .'</h4>';
                 }
             ?>
     </div>

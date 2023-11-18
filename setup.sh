@@ -22,3 +22,4 @@ setfacl -m u:www-data:rwx uploads/
 setfacl -R -m u:www-data:rx pdf_scripts/
 setfacl -R -m u:www-data:rx venv_proj/
 setfacl -m u:www-data:rwx final_results/
+setfacl -m u:www-data:rwx temp/
