@@ -49,4 +49,4 @@ def encrypt_pdf(file_name, password, process_type):
 		return decrypt_pdf_name
 	
 	else:
-		 raise Exception("Error handling files")
+		raise Exception("Error handling files")

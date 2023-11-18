@@ -21,3 +21,10 @@ mkdir uploads
 curr_dir=$(pwd)
 
 echo "export UPLOAD_FILES_PATH=\"${curr_dir}/uploads\"; export TEMP_FILES_PATH=\"${curr_dir}/temp\"; export FINAL_FILES_PATH=\"${curr_dir}/final_results\";" >> ./venv_proj/bin/activate
+
+# Setting up directory permissions for NGINX server (user: www-data) to access/write
+setfacl -m u:www-data:rwx uploads/
+setfacl -R -m u:www-data:rx pdf_scripts/
+setfacl -R -m u:www-data:rx venv_proj/
+setfacl -m u:www-data:rwx final_results/
+setfacl -m u:www-data:rwx temp/
