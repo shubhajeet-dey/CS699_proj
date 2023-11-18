@@ -31,6 +31,19 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 			// Getting file contents
 			echo shell_exec('cat ' . $filePath);
 			exit();
+		} else if($_GET['op'] === 'encrypt' && isset($_SESSION['encrypt']['file'])) {
+			// Downloading the processed PDF file to the client computer
+			$filePath = $resultDir . $_SESSION['encrypt']['file'];
+
+			// Getting File size
+			$filesize = shell_exec('wc -c < ' . $filePath);
+			header("Content-disposition: attachment; filename=" . $_SESSION['encrypt']['file']);
+			header("Content-type: application/pdf");
+			header('Content-Length: ' . $filesize);
+
+			// Getting file contents
+			echo shell_exec('cat ' . $filePath);
+			exit();
 		}
 	}
 }

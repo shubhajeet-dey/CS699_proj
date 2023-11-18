@@ -13,13 +13,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: encrypt.php");
         exit();
     }
-    
+
     $_SESSION['encrypt']['active'] = 0;
     $_SESSION['encrypt']['process'] = 1;
-    $allowedImageExts = ['JPEG','PNG'];
+    $allowedProcess = ['ENCRYPT','DECRYPT'];
 
     // Check if the file is uploaded
-    if (!empty($_FILES["uploadedFile"]["name"]) && isset($_POST["selectedOption"]) && in_array($_POST["selectedOption"], $allowedImageExts, True)) {
+    if (!empty($_FILES["uploadedFile"]["name"]) && (isset($_POST["selectedOption"]) && in_array($_POST["selectedOption"], $allowedProcess, True)) && (isset($_POST['password']) && ctype_alnum($_POST['password']))) {
         $allowedMimeType = 'application/pdf';
         $newFile = "";
 
@@ -40,30 +40,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $newFile = $randomFileName;
 
             } else {
-                $_SESSION['pdftoimg']['error'] = "File {$_FILES["uploadedFile"]["name"]}: Invalid file type!";
+                $_SESSION['encrypt']['error'] = "File {$_FILES["uploadedFile"]["name"]}: Invalid file type!";
             }
         }else{
-            $_SESSION['pdftoimg']['error'] = "File {$_FILES["uploadedFile"]["name"]}: Size more than 50MB!";
+            $_SESSION['encrypt']['error'] = "File {$_FILES["uploadedFile"]["name"]}: Size more than 50MB!";
         }
 
-        if(empty($_SESSION['pdftoimg']['error'])) {
+        if(empty($_SESSION['encrypt']['error'])) {
             // Executing the python script
-            $args = array("operation"=>"pdf_to_image","file"=>$newFile,"image_type"=>$_POST['selectedOption']);
+            
+            $processType = 0;
+            if($_POST['selectedOption'] === 'DECRYPT') {
+                $processType = 1;
+            }
+
+            $args = array("operation"=>"encrypt","file"=>$newFile,"password"=>$_POST['password'],"process_type"=>$processType);
             $bashCommand = '. '. $venvDir .' && python3 ../pdf_scripts/manager.py ' . escapeshellarg(base64_encode(json_encode($args)));
             $output_file = shell_exec($bashCommand);
 
             //Error while executing the script
             if($output_file == null || strpos($output_file, 'Error') !== false || $output_file === false) {
-                $_SESSION['pdftoimg']['error'] = 'Error while processing the files!';
+                $_SESSION['encrypt']['error'] = 'Error while processing the files!';
             }else{
-                $_SESSION['pdftoimg']['file'] = $output_file;
+                $_SESSION['encrypt']['file'] = $output_file;
             }
         }
     } else {
-        $_SESSION['pdftoimg']['error'] = 'Error in uploading the files or Error in Image type selection!';
+        $_SESSION['encrypt']['error'] = 'Error in uploading the files or Password entered is not alphanumeric!';
     }
-}else if(!isset($_SESSION['pdftoimg']['process']) || $_SESSION['pdftoimg']['process'] === 0){
-    header("Location: pdftoimg.php");
+}else if(!isset($_SESSION['encrypt']['process']) || $_SESSION['encrypt']['process'] === 0){
+    header("Location: encrypt.php");
     exit();
 }
 ?>
@@ -71,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Convert PDF to IMGs</title>
+    <title>Encrypt PDF</title>
     <style>
         body {
             background-image: url('image2.webp');
@@ -193,10 +199,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <?php 
                 // Checking if no error message
-                if(empty($_SESSION['pdftoimg']['error'])) {
-                    echo '<a id="download-button" href="download.php?op=pdftoimg">Download ZIP of Images</a>';
+                if(empty($_SESSION['encrypt']['error'])) {
+                    echo '<a id="download-button" href="download.php?op=encrypt">Download Processed PDF</a>';
                 }else{
-                    echo '<h4 id="download-button">'. $_SESSION['pdftoimg']['error'] .'</h4>';
+                    echo '<h4 id="download-button">'. $_SESSION['encrypt']['error'] .'</h4>';
                 }
             ?>
     </div>
