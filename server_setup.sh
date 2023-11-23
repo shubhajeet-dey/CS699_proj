@@ -24,19 +24,11 @@ sudo systemctl restart nginx
 # Installing postgresql
 sudo apt install postgresql postgresql-contrib
 
-# Creating the database and user
-sudo -i -u postgres
-createdb pdf_tools
-createuser pdf_admin
-psql
-ALTER USER pdf_admin WITH ENCRYPTED PASSWORD 'my_world_is_great@699';
-ALTER USER pdf_admin CREATEDB;
-GRANT ALL PRIVILEGES ON DATABASE pdf_tools TO pdf_admin;
-\q
-exit
-
 # Install PHP postgresql extension
 sudo apt install php-pgsql
+
+# Run Database setup scripts
+sudo ./database_setup.sh
 
 # Server setup complete
 echo "~~~~~~~ Server setup Completed! ~~~~~~~"
