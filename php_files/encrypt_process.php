@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+// If not logged in, Redirect to login page
+if((!isset($_SESSION['login'])) || empty($_SESSION['login']['email'])) {
+    header("Location: login.php");
+    exit();
+}
+
 $_SESSION['encrypt']['error'] = '';
 $uploadDir = '../uploads/';
 $venvDir = '../venv_proj/bin/activate';

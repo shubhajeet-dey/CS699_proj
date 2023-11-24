@@ -1,5 +1,12 @@
 <?php
 session_start();
+
+// If not logged in, Redirect to login page
+if((!isset($_SESSION['login'])) || empty($_SESSION['login']['email'])) {
+    header("Location: login.php");
+    exit();
+}
+
 unset($_SESSION['encrypt']);
 $_SESSION['encrypt'] = array('active'=>1);
 $_SESSION['encrypt']['process'] = 0;
