@@ -202,7 +202,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </ul>
                 </div>
             </div>
-            <span id="sign-in">SIGN IN</span>
+            <span id="sign-in"><a style="text-decoration: none; color: white;" href="login.php">SIGN IN</a></span>
         </div>
     </div>
 
