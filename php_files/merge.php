@@ -129,6 +129,7 @@ $_SESSION['merge']['process'] = 0;
                         <li><a style="text-decoration: none; color: white;" href="merge.php">MERGE</a></li>
                         <li><a style="text-decoration: none; color: white;" href="pdftoimg.php">PDFTOIMG</a></li>
                         <li><a style="text-decoration: none; color: white;" href="encrypt.php">ENCRYPT</a></li>
+                        <li><a style="text-decoration: none; color: white;" href="rotate.php">ROTATE</a></li>
                     </ul>
                 </div>
             </div>

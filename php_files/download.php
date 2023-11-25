@@ -51,6 +51,19 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 			// Getting file contents
 			echo shell_exec('cat ' . $filePath);
 			exit();
+		} else if($_GET['op'] === 'rotate' && isset($_SESSION['rotate']['file'])) {
+			// Downloading the Rotated PDF file to the client computer
+			$filePath = $resultDir . $_SESSION['rotate']['file'];
+
+			// Getting File size
+			$filesize = shell_exec('wc -c < ' . $filePath);
+			header("Content-disposition: attachment; filename=" . $_SESSION['rotate']['file']);
+			header("Content-type: application/pdf");
+			header('Content-Length: ' . $filesize);
+
+			// Getting file contents
+			echo shell_exec('cat ' . $filePath);
+			exit();
 		}
 	}
 }
