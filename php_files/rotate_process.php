@@ -7,7 +7,7 @@ if((!isset($_SESSION['login'])) || empty($_SESSION['login']['email'])) {
     exit();
 }
 
-$_SESSION['pdftoimg']['error'] = '';
+$_SESSION['rotate']['error'] = '';
 $uploadDir = '../uploads/';
 $venvDir = '../venv_proj/bin/activate';
 
@@ -15,16 +15,17 @@ $venvDir = '../venv_proj/bin/activate';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     //Checking if the request came from pdftoimg.php
-    if(!isset($_SESSION['pdftoimg']['active']) || $_SESSION['pdftoimg']['active'] === 0) {
-        header("Location: pdftoimg.php");
+    if(!isset($_SESSION['rotate']['active']) || $_SESSION['rotate']['active'] === 0) {
+        header("Location: rotate.php");
         exit();
     }
-    $_SESSION['pdftoimg']['active'] = 0;
-    $_SESSION['pdftoimg']['process'] = 1;
-    $allowedImageExts = ['JPEG','PNG'];
+
+    $_SESSION['rotate']['active'] = 0;
+    $_SESSION['rotate']['process'] = 1;
+    $allowedRotation = ['90 DEG','180 DEG','270 DEG'];
 
     // Check if the file is uploaded
-    if (!empty($_FILES["uploadedFile"]["name"]) && isset($_POST["selectedOption"]) && in_array($_POST["selectedOption"], $allowedImageExts, True)) {
+    if (!empty($_FILES["uploadedFile"]["name"]) && (isset($_POST["selectedOption"]) && in_array($_POST["selectedOption"], $allowedRotation, True))) {
         $allowedMimeType = 'application/pdf';
         $newFile = "";
 
@@ -45,30 +46,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $newFile = $randomFileName;
 
             } else {
-                $_SESSION['pdftoimg']['error'] = "File {$_FILES["uploadedFile"]["name"]}: Invalid file type!";
+                $_SESSION['rotate']['error'] = "File {$_FILES["uploadedFile"]["name"]}: Invalid file type!";
             }
         }else{
-            $_SESSION['pdftoimg']['error'] = "File {$_FILES["uploadedFile"]["name"]}: Size more than 50MB!";
+            $_SESSION['rotate']['error'] = "File {$_FILES["uploadedFile"]["name"]}: Size more than 50MB!";
         }
 
-        if(empty($_SESSION['pdftoimg']['error'])) {
+        if(empty($_SESSION['rotate']['error'])) {
             // Executing the python script
-            $args = array("operation"=>"pdf_to_image","file"=>$newFile,"image_type"=>$_POST['selectedOption']);
+            
+            // Rotation angle => (0: 90, 1: 180, 2: 270)
+            $rotateAngle = 0;
+            if($_POST['selectedOption'] === '180 DEG') {
+                $rotateAngle = 1;
+            } else if ($_POST['selectedOption'] === '270 DEG') {
+                $rotateAngle = 2;
+            }
+
+            $args = array("operation"=>"rotate","file"=>$newFile,"rotate_angle"=>$rotateAngle);
             $bashCommand = '. '. $venvDir .' && python3 ../pdf_scripts/manager.py ' . escapeshellarg(base64_encode(json_encode($args)));
             $output_file = shell_exec($bashCommand);
 
             //Error while executing the script
             if($output_file == null || strpos($output_file, 'Error') !== false || $output_file === false) {
-                $_SESSION['pdftoimg']['error'] = 'Error while processing the files!';
+                $_SESSION['rotate']['error'] = 'Error while processing the files!';
             }else{
-                $_SESSION['pdftoimg']['file'] = $output_file;
+                $_SESSION['rotate']['file'] = $output_file;
             }
         }
     } else {
-        $_SESSION['pdftoimg']['error'] = 'Error in uploading the files or Error in Image type selection!';
+        $_SESSION['rotate']['error'] = 'Error in uploading the files!';
     }
-}else if(!isset($_SESSION['pdftoimg']['process']) || $_SESSION['pdftoimg']['process'] === 0){
-    header("Location: pdftoimg.php");
+}else if(!isset($_SESSION['rotate']['process']) || $_SESSION['rotate']['process'] === 0){
+    header("Location: rotate.php");
     exit();
 }
 ?>
@@ -76,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Convert PDF to IMGs</title>
+    <title>ROTATE PDF</title>
     <style>
         body {
             background-image: url('image2.webp');
@@ -198,10 +208,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <?php 
                 // Checking if no error message
-                if(empty($_SESSION['pdftoimg']['error'])) {
-                    echo '<a id="download-button" href="download.php?op=pdftoimg">Download ZIP of Images</a>';
+                if(empty($_SESSION['rotate']['error'])) {
+                    echo '<a id="download-button" href="download.php?op=rotate">Download Rotated PDF</a>';
                 }else{
-                    echo '<h4 id="download-button">'. $_SESSION['pdftoimg']['error'] .'</h4>';
+                    echo '<h4 id="download-button">'. $_SESSION['rotate']['error'] .'</h4>';
                 }
             ?>
     </div>

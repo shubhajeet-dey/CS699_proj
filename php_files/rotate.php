@@ -7,15 +7,15 @@ if((!isset($_SESSION['login'])) || empty($_SESSION['login']['email'])) {
     exit();
 }
 
-unset($_SESSION['pdftoimg']);
-$_SESSION['pdftoimg'] = array('active'=>1);
-$_SESSION['pdftoimg']['process'] = 0;
+unset($_SESSION['rotate']);
+$_SESSION['rotate'] = array('active'=>1);
+$_SESSION['rotate']['process'] = 0;
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Convert PDF to IMGs</title>
+    <title>ROTATE PDF</title>
     <style>
         body {
             background-image: url('image2.webp');
@@ -98,7 +98,7 @@ $_SESSION['pdftoimg']['process'] = 0;
 
         #submit-container {
             text-align: center;
-            margin-top: 80px;
+            margin-top: 120px;
         }
 
         #submit-button {
@@ -119,7 +119,7 @@ $_SESSION['pdftoimg']['process'] = 0;
 
         .dropdown-container {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 40px;
         }
 
         .dropdown-button {
@@ -143,8 +143,8 @@ $_SESSION['pdftoimg']['process'] = 0;
             z-index: 1;
             justify-content: center;
             left: 50%;
-            width: 60px;
-            margin-left:-30px;
+            width: 100px;
+            margin-left:-50px;
         }
 
         .dropdown-option {
@@ -178,7 +178,7 @@ $_SESSION['pdftoimg']['process'] = 0;
         </div>
     </div>
 
-    <form method="post" action="pdftoimg_process.php" enctype="multipart/form-data">
+    <form method="post" action="rotate_process.php" enctype="multipart/form-data">
         <div id="upload">
             <label for="file-upload" class="upload-button">Upload File</label>
             <input type="file" id="file-upload" accept=".pdf" name="uploadedFile" required>
@@ -186,13 +186,14 @@ $_SESSION['pdftoimg']['process'] = 0;
 
         <div id="uploaded-file"></div>
         <div class="dropdown-container">
-            <button class="dropdown-button" onclick="toggleDropdown()" type="button">Choose Image Type</button>
-            <div class="dropdown-content" id="imageTypeDropdown">
-                <div class="dropdown-option" onclick="selectOption('JPEG')">JPEG</div>
-                <div class="dropdown-option" onclick="selectOption('PNG')">PNG</div>
+            <button class="dropdown-button" onclick="toggleDropdown()" type="button">Choose Clockwise Rotation Angle</button>
+            <div class="dropdown-content" id="processTypeDropdown">
+                <div class="dropdown-option" onclick="selectOption('90 DEG')">90 DEG</div>
+                <div class="dropdown-option" onclick="selectOption('180 DEG')">180 DEG</div>
+                <div class="dropdown-option" onclick="selectOption('270 DEG')">270 DEG</div>
             </div>
         </div>
-    
+        
         <input type="hidden" name="selectedOption" id="selectedOption" value="">
 
         <div id="submit-container">
@@ -233,7 +234,7 @@ $_SESSION['pdftoimg']['process'] = 0;
         });
 
         function toggleDropdown() {
-            var dropdownContent = document.getElementById("imageTypeDropdown");
+            var dropdownContent = document.getElementById("processTypeDropdown");
             dropdownContent.style.display = (dropdownContent.style.display === "block") ? "none" : "block";
         }
 
@@ -247,7 +248,7 @@ $_SESSION['pdftoimg']['process'] = 0;
 
             selectedOptionInput.value = option;
 
-            var dropdownContent = document.getElementById("imageTypeDropdown");
+            var dropdownContent = document.getElementById("processTypeDropdown");
             dropdownContent.style.display = "none";
         }
     </script>

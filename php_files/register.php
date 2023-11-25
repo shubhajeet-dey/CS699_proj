@@ -195,10 +195,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <h1>FUNCTIONS</h1>
                 <div class="popup">
                     <ul>
-                        <li>EDIT</li>
-                        <li>MERGE</li>
-                        <li>SPLIT</li>
-                        <!-- Add more functionality options as needed -->
+                        <li><a style="text-decoration: none; color: white;" href="merge.php">MERGE</a></li>
+                        <li><a style="text-decoration: none; color: white;" href="pdftoimg.php">PDFTOIMG</a></li>
+                        <li><a style="text-decoration: none; color: white;" href="encrypt.php">ENCRYPT</a></li>
+                        <li><a style="text-decoration: none; color: white;" href="rotate.php">ROTATE</a></li>
                     </ul>
                 </div>
             </div>

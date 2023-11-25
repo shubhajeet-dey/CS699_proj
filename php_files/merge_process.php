@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $output_file = shell_exec($bashCommand);
 
             //Error while executing the script
-            if($output_file == null || $output_file === 'Error: File Handling' || $output_file === false) {
+            if($output_file == null || strpos($output_file, 'Error') !== false || $output_file === false) {
                 $_SESSION['merge']['error'] = 'Error while processing the files!';
             }else{
                 $_SESSION['merge']['file'] = $output_file;
@@ -183,14 +183,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <h1>FUNCTIONS</h1>
                 <div class="popup">
                     <ul>
-                        <li>EDIT</li>
-                        <li>MERGE</li>
-                        <li>SPLIT</li>
-                        <!-- Add more functionality options as needed -->
+                        <li><a style="text-decoration: none; color: white;" href="merge.php">MERGE</a></li>
+                        <li><a style="text-decoration: none; color: white;" href="pdftoimg.php">PDFTOIMG</a></li>
+                        <li><a style="text-decoration: none; color: white;" href="encrypt.php">ENCRYPT</a></li>
+                        <li><a style="text-decoration: none; color: white;" href="rotate.php">ROTATE</a></li>
                     </ul>
                 </div>
             </div>
-            <span id="sign-in">SIGN IN</span>
+            <span id="sign-in"><?php echo $_SESSION['login']['email']; ?></span>
         </div>
     </div>
     <div class="progress-bar-container">
